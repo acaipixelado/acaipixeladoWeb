@@ -1,5 +1,13 @@
 /** @type {import('tailwindcss').Config} */
-const plugin = require('tailwindcss/plugin')
+
+// plugins
+import DropShadowPlugin from './src/functions/tailwindcss/plugins/dropShadow'
+// safelist
+import DropShadowSafelist from './src/functions/tailwindcss/safelist/dropShadow'
+import TextSafelist from './src/functions/tailwindcss/safelist/text'
+
+const twcss_plugin = require('tailwindcss/plugin')
+const twcss_colors = require('tailwindcss/colors')
 
 module.exports = {
   content: [
@@ -10,7 +18,7 @@ module.exports = {
     extend: {
       keyframes: {
         spin: {
-          '0%' : { transform: 'rotate(0deg)' },
+          '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' }
         },
       },
@@ -20,32 +28,15 @@ module.exports = {
     }
   },
   plugins: [
-    plugin(function ({ addUtilities, theme }) {
-      const colors = theme('colors')
-      const newUtilities = {}
-
-      Object.keys(colors).forEach(colorName => {
-        const colorShades = colors[colorName]
-        if (typeof colorShades === 'object') {
-          Object.keys(colorShades).forEach(shade => {
-            newUtilities[`.drop-shadow-1rem-${colorName}-${shade}`] = {
-              filter: `drop-shadow(0 0 1rem ${colorShades[shade]})`
-            }
-            newUtilities[`.drop-shadow-4rem-${colorName}-${shade}`] = {
-              filter: `drop-shadow(0 0 4rem ${colorShades[shade]})`
-            }
-          })
-        } else {
-          newUtilities[`.drop-shadow-1rem-${colorName}`] = {
-            filter: `drop-shadow(0 0 1rem ${colorShades})`
-          }
-          newUtilities[`.drop-shadow-4rem-${colorName}`] = {
-            filter: `drop-shadow(0 0 4rem ${colorShades})`
-          }
-        }
-      })
-
-      addUtilities(newUtilities, ['responsive', 'hover'])
-    }),
+    twcss_plugin(function ({ addUtilities, theme }) {
+      addUtilities (
+        DropShadowPlugin(theme('colors')),
+        ['responsive', 'hover']
+      )
+    })
+  ],
+  safelist: [
+    ...DropShadowSafelist(twcss_colors),
+    ...TextSafelist(twcss_colors)
   ]
 }
